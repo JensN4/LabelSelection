@@ -4,6 +4,16 @@ This is a plugin for https://www.sketchapp.com/[Sketch]. It adds a semi-transpar
 
 This allows for adding explanations to UI designs, e.g. so that implementors know which groups or components are to be used to create a certain page or dialog.
 
+== Example
+
+Before:
+
+image:doc/before.png[]
+
+After:
+
+image:doc/after.png[]
+
 == License
 
 Eclipse Public License, 1.0
