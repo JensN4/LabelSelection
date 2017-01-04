@@ -1,0 +1,9 @@
+== LabelSelection
+
+This is a plugin for https://www.sketchapp.com/[Sketch]. It adds a semi-transparent box with a label on top of the current selection. The label is using the name of the first element of the selection.
+
+This allows for adding explanations to UI designs, e.g. so that implementors know which groups or components are to be used to create a certain page or dialog.
+
+== License
+
+Eclipse Public License, 1.0

@@ -1,0 +1,50 @@
+{
+  "name" : "LabelSelection",
+  "author" : "Jens von Pilgrim",
+  "homepage": "http://numberfour.eu",
+  "bundleVersion": 1,
+  "identifier" : "eu.numberfour.labelselection",
+  "version" : 0.1,
+  "description" : "Highlight selection with semi-transparent box and label. The name of the selection is used as default value for the label.",
+  "authorEmail" : "jens.von.pilgrim@numberfour.eu",
+  "compatibleVersion": 41,
+
+  "commands" : [
+    {
+      "script" : "labelselection.cocoascript",
+      "handler" : "labelSelectionYellow",
+      "shortcut" : "shift alt cmd 6",
+      "name" : "Label Selection Yellow",
+      "identifier" : "labelSelectionYellow"
+    },
+    {
+      "script" : "labelselection.cocoascript",
+      "handler" : "labelSelectionRed",
+      "shortcut" : "shift alt cmd 7",
+      "name" : "Label Selection Red",
+      "identifier" : "labelSelectionRed"
+    },
+    {
+      "script" : "labelselection.cocoascript",
+      "handler" : "labelSelectionGreen",
+      "shortcut" : "shift alt cmd 8",
+      "name" : "Label Selection Green",
+      "identifier" : "labelSelectionGreen"
+    },
+    {
+      "script" : "labelselection.cocoascript",
+      "handler" : "labelSelectionBlue",
+      "shortcut" : "shift alt cmd 9",
+      "name" : "Label Selection Blue",
+      "identifier" : "labelSelectionBlue"
+    }
+  ],
+  "menu" : {
+    "items" : [
+      "labelSelectionYellow",
+      "labelSelectionRed",
+      "labelSelectionGreen",
+      "labelSelectionBlue"
+    ]
+  }
+}

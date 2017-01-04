@@ -1,0 +1,96 @@
+var labelSelectionYellow = function(context) {
+	doLabelSelection(context, "#FCF59D")
+}
+var labelSelectionRed = function(context) {
+	doLabelSelection(context, "#FCB0B0")
+}
+var labelSelectionGreen = function(context) {
+	doLabelSelection(context, "#A3FFAC")
+}
+var labelSelectionBlue = function(context) {
+	doLabelSelection(context, "#A3DFFF")
+}
+
+// for testing:
+labelSelectionYellow(context);
+
+function doLabelSelection(context, color) {
+	var doc            = context.document;
+	var selectedLayers = context.selection;
+	var selectedCount  = selectedLayers.count();
+	var firstLayer     = selectedLayers.firstObject();
+
+	if (selectedCount == 0) {
+		doc.displayMessage('Nothing selected');
+	} else {
+		var artboard = firstLayer.parentGroup();
+		
+		//while (artboard.class() != MSArtboardGroup) {
+		//	artboard = artboard.parentGroup();
+		//}
+
+		log(firstLayer);
+
+		var frame = firstLayer.frame();
+		var left = frame.x();
+		var right = frame.x()+frame.width();
+		var top = frame.y();
+		var bottom = frame.y()+frame.height();
+		var name = firstLayer.name();
+		firstLayer.setIsSelected(false);
+		for (var i = 1; i < selectedCount; i++){
+			frame = selectedLayers[i].frame();
+			left = Math.min(left,frame.x());
+			right = Math.max(right,frame.x()+frame.width());
+			top = Math.min(top,frame.y());
+			bottom = Math.max(bottom,frame.y()+frame.height());
+			if (name=="") name=selectedLayers[i].name();
+			selectedLayers[i].setIsSelected(false);
+		}
+		if (name==undefined || name=="") name="Label";
+		addLabelAndText(artboard, name, left, top, right-left, bottom-top, color);
+	}
+
+	function addLabelAndText(artboard, name, posX, posY, width, height, color) {
+		var subPaddingX = 0;
+		var subPaddingY = 0;
+		var paddingX    = 0;
+		var paddingY    = 0;
+		
+		// padding, not used yet
+		var paddingWidth  = paddingX + subPaddingX;
+		var paddingHeight = paddingY + subPaddingY;
+		width             = width + paddingWidth;
+		height            = height + paddingHeight;
+
+		posX -= (paddingWidth / 2);
+		posY -= (paddingHeight / 2);
+		
+
+		var rect = MSRectangleShape.alloc().init();
+		rect.frame = MSRect.rectWithRect(NSMakeRect(posX, posY, width, height));
+
+		var shapeGroup = MSShapeGroup.shapeWithPath(rect);
+		var fill = shapeGroup.style().addStylePartOfType(0);
+		fill.color = MSImmutableColor.colorWithSVGString(color).newMutableCounterpart()
+		fill.setOpacity(0.5)
+		shapeGroup.name = name + "_Rect";
+
+		var text = MSTextLayer.alloc().init();
+		text.stringValue = name;
+		text.frame = MSRect.rectWithRect(NSMakeRect(posX, posY, width, 70));
+		text.fontSize = 48;
+		text.name = name +"_Text";
+
+		var group = MSLayerGroup.alloc().init();
+		group.addLayers([shapeGroup, text]);
+		group.name = "Highlight_" + name;
+
+		artboard.addLayers([group]);
+
+		group.setIsSelected(true);
+		
+	}
+
+	
+}
