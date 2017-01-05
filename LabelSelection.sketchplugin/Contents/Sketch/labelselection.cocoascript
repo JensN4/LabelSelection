@@ -1,14 +1,33 @@
+/**
+ * Copyright (c) 2017 NumberFour AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *   Jens von Pilgrim - Initial implementation
+ */
+
+var LABELFONTSIZE = 48;
+var YELLOWBACKGROUND = "#FCF59D";
+var GREENBACKGROUND = "#A3FFAC";
+var REDBACKGROUND = "#FCB0B0";
+var BLUEBACKGROUND = "#A3DFFF";
+var OPACITY = 0.5;
+var LABEL_SELECTIONS_GROUP_NAME = "_LabelSelections_"
+
 var labelSelectionYellow = function(context) {
-	doLabelSelection(context, "#FCF59D")
+	doLabelSelection(context, YELLOWBACKGROUND)
 }
 var labelSelectionRed = function(context) {
-	doLabelSelection(context, "#FCB0B0")
+	doLabelSelection(context, REDBACKGROUND)
 }
 var labelSelectionGreen = function(context) {
-	doLabelSelection(context, "#A3FFAC")
+	doLabelSelection(context, GREENBACKGROUND)
 }
 var labelSelectionBlue = function(context) {
-	doLabelSelection(context, "#A3DFFF")
+	doLabelSelection(context, BLUEBACKGROUND)
 }
 
 // for testing:
@@ -16,6 +35,7 @@ labelSelectionYellow(context);
 
 function doLabelSelection(context, color) {
 	var doc            = context.document;
+
 	var selectedLayers = context.selection;
 	var selectedCount  = selectedLayers.count();
 	var firstLayer     = selectedLayers.firstObject();
@@ -23,14 +43,7 @@ function doLabelSelection(context, color) {
 	if (selectedCount == 0) {
 		doc.displayMessage('Nothing selected');
 	} else {
-		var artboard = firstLayer.parentGroup();
-		
-		//while (artboard.class() != MSArtboardGroup) {
-		//	artboard = artboard.parentGroup();
-		//}
-
-		log(firstLayer);
-
+		var parent = firstLayer.parentGroup();
 		var frame = firstLayer.frame();
 		var left = frame.x();
 		var right = frame.x()+frame.width();
@@ -48,10 +61,10 @@ function doLabelSelection(context, color) {
 			selectedLayers[i].setIsSelected(false);
 		}
 		if (name==undefined || name=="") name="Label";
-		addLabelAndText(artboard, name, left, top, right-left, bottom-top, color);
+		addLabelAndText(parent, name, left, top, right-left, bottom-top, color);
 	}
 
-	function addLabelAndText(artboard, name, posX, posY, width, height, color) {
+	function addLabelAndText(parent, name, posX, posY, width, height, color) {
 		var subPaddingX = 0;
 		var subPaddingY = 0;
 		var paddingX    = 0;
@@ -62,10 +75,17 @@ function doLabelSelection(context, color) {
 		var paddingHeight = paddingY + subPaddingY;
 		width             = width + paddingWidth;
 		height            = height + paddingHeight;
-
 		posX -= (paddingWidth / 2);
 		posY -= (paddingHeight / 2);
-		
+
+		var top = parent;
+        while (top.class() != MSArtboardGroup && top.parentGroup()) {
+			var tX = top.frame().x();
+			var tY = top.frame().y();
+			posX += tX;
+			posY += tY;
+			top = top.parentGroup();
+		}
 
 		var rect = MSRectangleShape.alloc().init();
 		rect.frame = MSRect.rectWithRect(NSMakeRect(posX, posY, width, height));
@@ -73,24 +93,37 @@ function doLabelSelection(context, color) {
 		var shapeGroup = MSShapeGroup.shapeWithPath(rect);
 		var fill = shapeGroup.style().addStylePartOfType(0);
 		fill.color = MSImmutableColor.colorWithSVGString(color).newMutableCounterpart()
-		fill.setOpacity(0.5)
+		fill.setOpacity(OPACITY)
 		shapeGroup.name = name + "_Rect";
 
 		var text = MSTextLayer.alloc().init();
 		text.stringValue = name;
-		text.frame = MSRect.rectWithRect(NSMakeRect(posX, posY, width, 70));
-		text.fontSize = 48;
+		text.frame = MSRect.rectWithRect(NSMakeRect(posX, posY, width, LABELFONTSIZE*1.5));
+		text.fontSize = LABELFONTSIZE;
 		text.name = name +"_Text";
 
 		var group = MSLayerGroup.alloc().init();
 		group.addLayers([shapeGroup, text]);
 		group.name = "Highlight_" + name;
 
-		artboard.addLayers([group]);
-
+        var labelSelections = findOrCreateLabelSelections(top);
+        labelSelections.addLayers([group]);
+        
 		group.setIsSelected(true);
 		
 	}
 
-	
+	function findOrCreateLabelSelections(top) {
+		for (var i = 0; i<top.containedLayersCount(); i++) {
+            var child = top.layerAtIndex(i);
+            log(child.name())
+            if (child.name()==LABEL_SELECTIONS_GROUP_NAME) {
+            	return child;
+            }
+        }
+        var group = MSLayerGroup.alloc().init();
+		group.name = LABEL_SELECTIONS_GROUP_NAME;
+		top.addLayers([group]);
+		return group;
+    }
 }
