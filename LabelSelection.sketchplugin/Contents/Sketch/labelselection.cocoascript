@@ -49,7 +49,10 @@ function doLabelSelection(context, color) {
 		var right = frame.x()+frame.width();
 		var top = frame.y();
 		var bottom = frame.y()+frame.height();
-		var name = firstLayer.name();
+		var name = getName(firstLayer.name());
+		if (name==null) {
+			return; //canceled
+		}
 		firstLayer.setIsSelected(false);
 		for (var i = 1; i < selectedCount; i++){
 			frame = selectedLayers[i].frame();
@@ -126,4 +129,34 @@ function doLabelSelection(context, color) {
 		top.addLayers([group]);
 		return group;
     }
+
+    function getName(defaultName) {
+  		var dlg = COSAlertWindow.new();
+  		dlg.setMessageText("Name of selected component")
+  		dlg.addButtonWithTitle("Ok");
+  		dlg.addButtonWithTitle("Cancel");
+
+  		// Create the main view
+		var dx = 300;
+		var dy = 140;
+		var view = NSView.alloc().initWithFrame(NSMakeRect(0, 0, dx, dy));
+		dlg.addAccessoryView(view);
+
+		var label = NSTextField.alloc().initWithFrame(NSMakeRect(0, dy - 20, (dx / 2) - 8, 20));
+		label.setStringValue("Name: ");
+		label.setSelectable(false);
+		label.setEditable(false);
+		label.setBezeled(false);
+		label.setDrawsBackground(false);
+		
+		view.addSubview(label);
+		field = NSTextField.alloc().initWithFrame(NSMakeRect(0, dy - 40, (dx / 2) - 8, 20));
+		view.addSubview(field);
+		field.setStringValue(defaultName);
+		
+		if (dlg.runModal()==1000) {
+			return field.stringValue();
+		}
+		return null;
+	}
 }

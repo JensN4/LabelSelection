@@ -4,7 +4,7 @@
   "homepage": "http://numberfour.eu",
   "bundleVersion": 1,
   "identifier" : "eu.numberfour.labelselection",
-  "version" : 0.2,
+  "version" : 0.3,
   "description" : "Highlight selection with semi-transparent box and label. The name of the selection is used as default value for the label.",
   "authorEmail" : "jens.von.pilgrim@numberfour.eu",
   "compatibleVersion": 41,
